@@ -1,4 +1,4 @@
-        #include "list.h"
+        #include "cursor.h"
         #include <stdlib.h>
         #include "fatal.h"
 
@@ -9,57 +9,89 @@
             Position    Next;
         };
 
+        struct Node CursorSpace[ SpaceSize ];
+
+/* START: fig3_31.txt */
+        static Position
+        CursorAlloc( void )
+        {
+            Position P;
+
+            P = CursorSpace[ 0 ].Next;
+            CursorSpace[ 0 ].Next = CursorSpace[ P ].Next;
+
+            return P;
+        }
+
+        static void
+        CursorFree( Position P )
+        {
+            CursorSpace[ P ].Next = CursorSpace[ 0 ].Next;
+            CursorSpace[ 0 ].Next = P;
+        }
+/* END */
+
+        void
+        InitializeCursorSpace( void )
+        {
+            int i;
+
+            for( i = 0; i < SpaceSize; i++ )
+                CursorSpace[ i ].Next = i + 1;
+            CursorSpace[ SpaceSize - 1 ].Next = 0;
+        }
+
         List
         MakeEmpty( List L )
         {
             if( L != NULL )
                 DeleteList( L );
-            L = malloc( sizeof( struct Node ) );
-            if( L == NULL )
+            L = CursorAlloc( );
+            if( L == 0 )
                 FatalError( "Out of memory!" );
-            L->Next = NULL;
+            CursorSpace[ L ].Next = 0;
             return L;
         }
 
-/* START: fig3_8.txt */
+/* START: fig3_32.txt */
         /* Return true if L is empty */
 
         int
         IsEmpty( List L )
         {
-            return L->Next == NULL;
+            return CursorSpace[ L ].Next == 0;
         }
 /* END */
 
-/* START: fig3_9.txt */
+/* START: fig3_33.txt */
         /* Return true if P is the last position in list L */
         /* Parameter L is unused in this implementation */
 
         int IsLast( Position P, List L )
         {
-            return P->Next == NULL;
+            return CursorSpace[ P ].Next == 0;
         }
 /* END */
 
-/* START: fig3_10.txt */
-        /* Return Position of X in L; NULL if not found */
+/* START: fig3_34.txt */
+        /* Return Position of X in L; 0 if not found */
+        /* Uses a header node */
 
         Position
         Find( ElementType X, List L )
         {
             Position P;
 
-/* 1*/      P = L->Next;
-/* 2*/      while( P != NULL && P->Element != X )
-/* 3*/          P = P->Next;
+/* 1*/      P = CursorSpace[ L ].Next;
+/* 2*/      while( P && CursorSpace[ P ].Element != X )
+/* 3*/          P = CursorSpace[ P ].Next;
 
 /* 4*/      return P;
         }
 /* END */
 
-/* START: fig3_11.txt */
+/* START: fig3_35.txt */
         /* Delete from a list */
-        /* Cell pointed to by P->Next is wiped out */
         /* Assume that the position is legal */
         /* Assume use of a header node */
 
@@ -72,15 +104,14 @@
 
             if( !IsLast( P, L ) )  /* Assumption of header use */
             {                      /* X is found; delete it */
-                TmpCell = P->Next;
-                P->Next = TmpCell->Next;  /* Bypass deleted cell */
-                free( TmpCell );
+                TmpCell = CursorSpace[ P ].Next;
+                CursorSpace[ P ].Next = CursorSpace[ TmpCell ].Next;
+                CursorFree( TmpCell );
             }
         }
 /* END */
 
-/* START: fig3_12.txt */
-        /* If X is not found, then Next field of returned value is NULL */
+        /* If X is not found, then Next field of returned value is 0 */
         /* Assumes a header */
 
         Position
@@ -89,14 +120,14 @@
             Position P;
 
 /* 1*/      P = L;
-/* 2*/      while( P->Next != NULL && P->Next->Element != X )
-/* 3*/          P = P->Next;
+/* 2*/      while( CursorSpace[ P ].Next &&
+                    CursorSpace[ CursorSpace[ P ].Next ].Element != X )
+/* 3*/          P = CursorSpace[ P ].Next;
 
 /* 4*/      return P;
         }
-/* END */
 
-/* START: fig3_13.txt */
+/* START: fig3_36.txt */
         /* Insert (after legal position P) */
         /* Header implementation assumed */
         /* Parameter L is unused in this implementation */
@@ -106,37 +137,17 @@
         {
             Position TmpCell;
 
-/* 1*/      TmpCell = malloc( sizeof( struct Node ) );
-/* 2*/      if( TmpCell == NULL )
+/* 1*/      TmpCell = CursorAlloc( );
+/* 2*/      if( TmpCell == 0 )
 /* 3*/          FatalError( "Out of space!!!" );
 
-/* 4*/      TmpCell->Element = X;
-/* 5*/      TmpCell->Next = P->Next;
-/* 6*/      P->Next = TmpCell;
+/* 4*/      CursorSpace[ TmpCell ].Element = X;
+/* 5*/      CursorSpace[ TmpCell ].Next = CursorSpace[ P ].Next;
+/* 6*/      CursorSpace[ P ].Next = TmpCell;
         }
 /* END */
 
-#if 0
-/* START: fig3_14.txt */
-        /* Incorrect DeleteList algorithm */
 
-        void
-        DeleteList( List L )
-        {
-            Position P;
-
-/* 1*/      P = L->Next;  /* Header assumed */
-/* 2*/      L->Next = NULL;
-/* 3*/      while( P != NULL )
-            {
-/* 4*/          free( P );
-/* 5*/          P = P->Next;
-            }
-        }
-/* END */
-#endif
-
-/* START: fig3_15.txt */
         /* Correct DeleteList algorithm */
 
         void
@@ -144,16 +155,15 @@
         {
             Position P, Tmp;
 
-/* 1*/      P = L->Next;  /* Header assumed */
-/* 2*/      L->Next = NULL;
-/* 3*/      while( P != NULL )
+/* 1*/      P = CursorSpace[ L ].Next;  /* Header assumed */
+/* 2*/      CursorSpace[ L ].Next = 0;
+/* 3*/      while( P != 0 )
             {
-/* 4*/          Tmp = P->Next;
-/* 5*/          free( P );
+/* 4*/          Tmp = CursorSpace[ P ].Next;
+/* 5*/          CursorFree( P );
 /* 6*/          P = Tmp;
             }
         }
-/* END */
 
         Position
         Header( List L )
@@ -164,17 +174,17 @@
         Position
         First( List L )
         {
-            return L->Next;
+            return CursorSpace[ L ].Next;
         }
 
         Position
         Advance( Position P )
         {
-            return P->Next;
+            return CursorSpace[ P ].Next;
         }
 
         ElementType
         Retrieve( Position P )
         {
-            return P->Element;
+            return CursorSpace[ P ].Element;
         }

@@ -1,172 +1,136 @@
-#include <list.h>
-#include <tree.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <malloc.h>
+        #include "tree.h"
+        #include <stdlib.h>
+        #include "fatal.h"
 
-int count = 0;
+        struct TreeNode
+        {
+            ElementType Element;
+            SearchTree  Left;
+            SearchTree  Right;
+        };
 
-//先序创建二叉树
-int CreateBiTree(BiTree *T)
-{
-	ElemType ch;
-	ElemType temp;
+/* START: fig4_17.txt */
+        SearchTree
+        MakeEmpty( SearchTree T )
+        {
+            if( T != NULL )
+            {
+                MakeEmpty( T->Left );
+                MakeEmpty( T->Right );
+                free( T );
+            }
+            return NULL;
+        }
+/* END */
 
-	scanf("%d", &ch);
-	temp = getchar();
+/* START: fig4_18.txt */
+        Position
+        Find( ElementType X, SearchTree T )
+        {
+            if( T == NULL )
+                return NULL;
+            if( X < T->Element )
+                return Find( X, T->Left );
+            else
+            if( X > T->Element )
+                return Find( X, T->Right );
+            else
+                return T;
+        }
+/* END */
 
-	if (ch == 0)
-		*T = NULL;
-	else
-	{
-		*T = (BiTree)malloc(sizeof(BiTNode));
-		if (!(*T))
-		{
-			printf("malloc error\n");
-			return -1;
-		}
-		(*T)->data = ch;
-		printf("Input %d left  child: ", ch);
-		CreateBiTree(&(*T)->lChild);
-		printf("Input %d right child: ", ch);
-		CreateBiTree(&(*T)->rChild);
-	}
-	return 1;
-}
+/* START: fig4_19.txt */
+        Position
+        FindMin( SearchTree T )
+        {
+            if( T == NULL )
+                return NULL;
+            else
+            if( T->Left == NULL )
+                return T;
+            else
+                return FindMin( T->Left );
+        }
+/* END */
 
-//先序遍历二叉树
-void TraverseBiTree(BiTree T)
-{
-	if (T == NULL)
-		return ;
-	printf("%d ", T->data);
-	TraverseBiTree(T->lChild);
-	TraverseBiTree(T->rChild);
-}
+/* START: fig4_20.txt */
+        Position
+        FindMax( SearchTree T )
+        {
+            if( T != NULL )
+                while( T->Right != NULL )
+                    T = T->Right;
 
-//二叉树非递归先序遍历
+            return T;
+        }
+/* END */
 
-//中序遍历二叉树
-void InOrderBiTree(BiTree T)
-{
-	if (T == NULL)
-		return ;
-	InOrderBiTree(T->lChild);
-	printf("%d ", T->data);
-	InOrderBiTree(T->rChild);
-}
+/* START: fig4_22.txt */
+        SearchTree
+        Insert( ElementType X, SearchTree T )
+        {
+/* 1*/      if( T == NULL )
+            {
+                /* Create and return a one-node tree */
+/* 2*/          T = malloc( sizeof( struct TreeNode ) );
+/* 3*/          if( T == NULL )
+/* 4*/              FatalError( "Out of space!!!" );
+                else
+                {
+/* 5*/              T->Element = X;
+/* 6*/              T->Left = T->Right = NULL;
+                }
+            }
+            else
+/* 7*/      if( X < T->Element )
+/* 8*/          T->Left = Insert( X, T->Left );
+            else
+/* 9*/      if( X > T->Element )
+/*10*/          T->Right = Insert( X, T->Right );
+            /* Else X is in the tree already; we'll do nothing */
 
-//后序遍历二叉树
-void PostOrderBiTree(BiTree T)
-{
-	if (T == NULL)
-		return ;
-	PostOrderBiTree(T->lChild);
-	PostOrderBiTree(T->rChild);
-	printf("%d ", T->data);
-}
+/*11*/      return T;  /* Do not forget this line!! */
+        }
+/* END */
 
-//二叉树的深度
-int TreeDeep(BiTree T)
-{
-	int dep = 0;
-	if(T)
-	{
-		int leftdep = TreeDeep(T->lChild);
-		int rightdep = TreeDeep(T->rChild);
-		dep = leftdep>=rightdep?leftdep+1:rightdep+1;
-	}
-	return dep;
-}
+/* START: fig4_25.txt */
+        SearchTree
+        Delete( ElementType X, SearchTree T )
+        {
+            Position TmpCell;
 
-//求二叉树叶子结点个数
-int Leafcount(BiTree T)
-{
-	if(T)
-	{
-		if(T->lChild ==NULL && T->rChild==NULL)
-			count++;
-		Leafcount(T->lChild);
-		Leafcount(T->rChild);
-	}
-	return count;
-}
+            if( T == NULL )
+                Error( "Element not found" );
+            else
+            if( X < T->Element )  /* Go left */
+                T->Left = Delete( X, T->Left );
+            else
+            if( X > T->Element )  /* Go right */
+                T->Right = Delete( X, T->Right );
+            else  /* Found element to be deleted */
+            if( T->Left && T->Right )  /* Two children */
+            {
+                /* Replace with smallest in right subtree */
+                TmpCell = FindMin( T->Right );
+                T->Element = TmpCell->Element;
+                T->Right = Delete( T->Element, T->Right );
+            }
+            else  /* One or zero children */
+            {
+                TmpCell = T;
+                if( T->Left == NULL ) /* Also handles 0 children */
+                    T = T->Right;
+                else if( T->Right == NULL )
+                    T = T->Left;
+                free( TmpCell );
+            }
 
-//以广义表的形式输出二叉树
-void printBinTree(BiTree T)
-{
-	if(T != NULL)
-	{
-		printf("%d",T->data);
-		if(T->lChild != NULL || T->rChild != NULL)
-		{
-			printf("(");
-			if(T->lChild != NULL)
-			{
-				printBinTree(T->lChild);
-			}
-			if(T->lChild != NULL || T->rChild != NULL)
-			{
-				printf(",");
-			}
-			if(T->rChild != NULL)
-			{
-				printBinTree(T->rChild);
-			}
-			printf(")");
-		}
-	}
-}
+            return T;
+        }
+/* END */
 
-//销毁一个二叉树
-void clearBiTree(BiTree T)
-{
-	if(T != NULL)
-	{
-		clearBiTree(T->lChild);
-		clearBiTree(T->rChild);
-		free(T);
-		T = NULL;
-	}
-}
-
-//主函数
-int main(void)
-{
-	BiTree T;
-	int deepth,num = 0;
-	
-	BiTree *p = (BiTree*)malloc(sizeof(BiTree));
-
-	printf("请输入第一个结点的值,0表示没有叶结点:\n");
-	CreateBiTree(&T);
-	
-	printf("先序遍历二叉树:\n");
-	TraverseBiTree(T);
-	printf("\n");
-	
-	printf("中序遍历二叉树:\n");
-	InOrderBiTree(T);
-	printf("\n");
-	
-	printf("后序遍历二叉树:\n");
-	PostOrderBiTree(T);
-	printf("\n");
-	
-	deepth = TreeDeep(T);
-	printf("树的深度为:%d",deepth);
-	printf("\n");
-	
-	num = Leafcount(T);
-	printf("树的叶子结点个数为:%d",num);
-	printf("\n");
-	
-	printf("以广义表的形式输出二叉树");
-	printBinTree(T);
-	printf("\n");
-	
-	//销毁二叉树
-	clearBiTree(T);
-	
-	return 0;
-}
+        ElementType
+        Retrieve( Position P )
+        {
+            return P->Element;
+        }
