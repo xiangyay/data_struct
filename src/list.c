@@ -2,7 +2,7 @@
         #include <stdlib.h>
         #include "fatal.h"
 
-        /* Place in the interface file */
+        /* 线性表数据结构 */
         struct Node
         {
             ElementType Element;
@@ -22,7 +22,7 @@
         }
 
 /* START: fig3_8.txt */
-        /* Return true if L is empty */
+        /* 判断L是不是空表 */
 
         int
         IsEmpty( List L )
@@ -32,7 +32,7 @@
 /* END */
 
 /* START: fig3_9.txt */
-        /* Return true if P is the last position in list L */
+        /* 判断P是不是链表的最后一个元素 */
         /* Parameter L is unused in this implementation */
 
         int IsLast( Position P, List L )
@@ -42,7 +42,7 @@
 /* END */
 
 /* START: fig3_10.txt */
-        /* Return Position of X in L; NULL if not found */
+        /* 返回X在L中的位置 */
 
         Position
         Find( ElementType X, List L )

@@ -1,6 +1,7 @@
         /* This file contains a collection of sorting routines */
 
         #include <stdlib.h>
+        #include <time.h>
         #include "fatal.h"
 
         typedef int ElementType;
@@ -12,29 +13,52 @@
             *Lhs = *Rhs;
             *Rhs = Tmp;
         }
+		
+/* START: 冒泡排序 */
+		void BubbleSort( ElementType A[ ], int N )
+		{
+			int i,j, P;
 
-/* START: fig7_2.txt */
+			for( P = 0; P < N; P++ )
+			{
+				for( j = P + 1; j < N; j++ )
+					if(A[P] > A[j])
+						Swap(&A[P], &A[j]);
+				/* 打印每次排序完之后的结果 */
+				for( i = 0; i < N; i++ )
+					printf("%d ",A[i]);
+				printf("\n");
+			}
+		}
+
+/* START: fig7_2.txt 插入排序 */
         void
         InsertionSort( ElementType A[ ], int N )
         {
-            int j, P;
+            int i,j, P;
             ElementType Tmp;
 
 /* 1*/      for( P = 1; P < N; P++ )
             {
 /* 2*/          Tmp = A[ P ];
 /* 3*/          for( j = P; j > 0 && A[ j - 1 ] > Tmp; j-- )
+				{
 /* 4*/              A[ j ] = A[ j - 1 ];
+				}
 /* 5*/          A[ j ] = Tmp;
+				/* 打印每次排序完之后的结果 */
+				for( i = 0; i < N; i++ )
+					printf("%d ",A[i]);
+				printf("\n");
             }
         }
 /* END */
 
-/* START: fig7_4.txt */
+/* START: fig7_4.txt 希尔排序 */
         void
         Shellsort( ElementType A[ ], int N )
         {
-            int i, j, Increment;
+            int i, j,P, Increment;
             ElementType Tmp;
 
 /* 1*/      for( Increment = N / 2; Increment > 0; Increment /= 2 )
@@ -47,8 +71,12 @@
                         else
 /* 7*/                      break;
 /* 8*/              A[ j ] = Tmp;
+					/* 打印每次排序完之后的结果 */
+	 				for( P = 0; P < N; P++ )
+						printf("%d ",A[P]);
+					printf("\n");
                 }
-        }
+       }
 /* END */
 
 /* START: fig7_8.txt */
@@ -271,11 +299,15 @@
         Permute( ElementType A[ ], int N )
         {
             int i;
-
+			/* 设置随机数种子，避免每次产生的序列相同 */
+			srand(time(NULL));
             for( i = 0; i < N; i++ )
                 A[ i ] = i;
             for( i = 1; i < N; i++ )
                 Swap( &A[ i ], &A[ rand( ) % ( i + 1 ) ] );
+			for( i = 0; i < N; i++ )
+				printf("%d ",A[i]);
+			printf("\n");
         }
 
         void
@@ -286,6 +318,9 @@
                 if( A[ i ] != i )
                     printf( "Sort fails: %d %d\n", i, A[ i ] );
             printf( "Check completed\n" );
+			for( i = 0; i < N; i++ )
+				printf("%d ",A[i]);
+			printf("\n");
         }
 
         void
@@ -296,7 +331,7 @@
                 Lhs[ i ] = Rhs[ i ];
         }
 
-        #define MaxSize 7000
+        #define MaxSize 9
         int Arr1[ MaxSize ];
         int Arr2[ MaxSize ];
 
@@ -304,18 +339,29 @@
         {
             int i;
 
-            for( i = 0; i < 10; i++ )
+      //      for( i = 0; i < 10; i++ )
             {
+            	printf("Create a rand array\n");
                 Permute( Arr2, MaxSize );
+				
+/*                Copy( Arr1, Arr2, MaxSize );
+				printf("BubbleSort\n");
+                BubbleSort( Arr1, MaxSize );
+                Checksort( Arr1, MaxSize );
+				printf("\n");
+				
                 Copy( Arr1, Arr2, MaxSize );
+				printf("InsertionSort\n");
                 InsertionSort( Arr1, MaxSize );
                 Checksort( Arr1, MaxSize );
-
+				printf("\n");*/
+				
                 Copy( Arr1, Arr2, MaxSize );
+				printf("Shellsort\n");
                 Shellsort( Arr1, MaxSize );
                 Checksort( Arr1, MaxSize );
 
-                Copy( Arr1, Arr2, MaxSize );
+/*                Copy( Arr1, Arr2, MaxSize );
                 Heapsort( Arr1, MaxSize );
                 Checksort( Arr1, MaxSize );
 
@@ -328,7 +374,7 @@
                 Checksort( Arr1, MaxSize );
 
                 Copy( Arr1, Arr2, MaxSize );
-                Qselect( Arr1, MaxSize / 2 + 1 + i, 0, MaxSize - 1 );
+                Qselect( Arr1, MaxSize / 2 + 1 + i, 0, MaxSize - 1 );*/
                 if( Arr1[ MaxSize / 2 + i ] != MaxSize / 2 + i )
                     printf( "Select error: %d %d\n", MaxSize / 2 + i ,
                                             Arr1[ MaxSize / 2 + i ] );

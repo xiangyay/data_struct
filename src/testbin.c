@@ -1,7 +1,7 @@
 #include "binomial.h"
 #include <stdio.h>
 
-#define MaxSize (12000)
+#define MaxSize (12)
 
 main( )
 {

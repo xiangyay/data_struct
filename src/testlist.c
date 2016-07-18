@@ -15,7 +15,7 @@ PrintList( const List L )
             P = Advance( P );
             printf( "%d ", Retrieve( P ) );
         } while( !IsLast( P, L ) );
-        printf( "\n" );
+        printf( "***\n" );
     }
 }
 
@@ -24,7 +24,18 @@ main( )
     List L;
     Position P;
     int i;
+	/*
+        struct Node
+        {
+            ElementType Element;
+            Position    Next;
+        };
+	*/
+	L = (struct Node*)malloc(sizeof(struct Node));
+	L->Next = NULL;
 
+
+	
     L = MakeEmpty( NULL );
     P = Header( L );
     PrintList( L );

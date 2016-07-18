@@ -1,0 +1,5 @@
+---- InsertionSort Matches (4 in 1 files) ----
+Sort.c (src):        InsertionSort( ElementType A[ ], int N )
+Sort.c (src):/*13*/          InsertionSort( A + Left, Right - Left + 1 );
+Sort.c (src):/*15*/          InsertionSort( A + Left, Right - Left + 1 );
+Sort.c (src):                InsertionSort( Arr1, MaxSize );
