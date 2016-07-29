@@ -5,10 +5,13 @@
         /* 线性表数据结构 */
         struct Node
         {
+        	/* 链表数据  int */
             ElementType Element;
+			/* 指向链表下一个数据的指针 struct Node指针  */
             Position    Next;
         };
 
+		/* 清空一个链表 */
         List
         MakeEmpty( List L )
         {
@@ -137,7 +140,7 @@
 #endif
 
 /* START: fig3_15.txt */
-        /* Correct DeleteList algorithm */
+        /* 非递归删除一个链表 */
 
         void
         DeleteList( List L )
