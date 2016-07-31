@@ -117,7 +117,7 @@
         }
 /* END */
 
-/* START: fig7_10.txt */
+/* START: fig7_10.txt ∫œ≤¢≈≈–Ú */
         /* Lpos = start of left half, Rpos = start of right half */
 
         void
